@@ -4,8 +4,8 @@ import './PageForm2.scss'
  
 export const PageForm2: FunctionComponent = () => {
   return (
-    <div className="HomePage">
-      <h1>asdsdasd</h1>
+    <div className="PageForm2">
+      <h1>Form 2</h1>
 
       <Link to={'/'}>Back</Link>
       <br />
