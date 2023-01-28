@@ -8,6 +8,8 @@ import { HomePage } from './pages/HomePage/HomePage';
 import { PostPage } from './pages/PostPage/PostPage';
 import { getAllUsers } from './api/users';
 import { User } from './type/User';
+import { PageForm1 } from './pages/PageForm1';
+import { PageForm2 } from './pages/PageForm2';
 
 export async function rootLoader() {
   const response = await getAllUsers();
@@ -30,33 +32,29 @@ export const router = createHashRouter([
         errorElement: <>Error on Homepage</>,
       },
       {
-        path: "/post/:id",
-        element: <PostPage />,
-        errorElement: <>Error on Homepage</>,
+        path: "/form1",
+        element: <PageForm1 />,
+        errorElement: <>Error on Form1Page</>,
       },
+      {
+        path: "/form2",
+        element: <PageForm2 />,
+        errorElement: <>Error on Form2Page</>,
+      },
+      // {
+      //   path: "/post/:id",
+      //   element: <PostPage />,
+      //   errorElement: <>Error on PostPage</>,
+      // },
     ],
   },
 ]);
 
 function App() {
-  const users = useLoaderData() as User[];
-  const posts = useAppSelector(selectPosts);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (posts.length === 0) {
-      dispatch(getPostsAsync());
-    }
-
-  }, [dispatch])
-
   return (
     <div className="App">
       <header className="App__Header">
         <h1>React Template</h1>
-        {users.length && users.map((user: User) => (
-          <p key={user.id}>{user.name}</p>
-        ))}
       </header>
 
       <main className="App__Container">

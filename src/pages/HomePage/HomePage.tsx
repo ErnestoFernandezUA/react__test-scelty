@@ -11,31 +11,8 @@ export const HomePage: FunctionComponent = () => {
   return (
     <div className="HomePage">
       <h1>HomePage</h1>
-      <ul style={{
-        listStyle: 'none',
-        textAlign: 'left',
-      }}>
-        {posts.map(post => (
-          <li key={post.id}>
-            <Link 
-              to={`post/${post.id}`}
-              style={{
-                display: 'block',
-                textDecoration: 'none',
-                color: 'grey',
-                border: '1px solid grey',
-                borderRadius: '10px',
-                margin: '1rem',
-                padding: '1rem',
-                boxSizing: 'border-box',
-                
-              }}
-            >
-              {`${post.id}. ${post.title}: ${post.body}`}
-            </Link>
-          </li>
-        ))}
-      </ul>
+
+      <Link to={'/form1'}>Form1</Link>
 
     </div>
   );
