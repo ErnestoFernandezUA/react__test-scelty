@@ -10,12 +10,15 @@ import { getAllUsers } from './api/users';
 import { User } from './type/User';
 import { PageForm1 } from './pages/PageForm1';
 import { PageForm2 } from './pages/PageForm2';
+import { ResultPage } from './pages/ResultPage';
 
 export async function rootLoader() {
   const response = await getAllUsers();
 
   return response;
 }
+
+// localStorage.clear();
 
 export const router = createHashRouter([
   {
@@ -41,11 +44,11 @@ export const router = createHashRouter([
         element: <PageForm2 />,
         errorElement: <>Error on Form2Page</>,
       },
-      // {
-      //   path: "/post/:id",
-      //   element: <PostPage />,
-      //   errorElement: <>Error on PostPage</>,
-      // },
+      {
+        path: "/result",
+        element: <ResultPage />,
+        errorElement: <>Error on ResultPage</>,
+      },
     ],
   },
 ]);
