@@ -5,7 +5,7 @@ includes:
   - persist
   - react-router-dom v6.6
   
-#Part 2
+#Part 2#
 Make three separate pages with this Svelte Kit:
 SignUp, ResultV1, ResultV2
 
