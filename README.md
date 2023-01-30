@@ -15,14 +15,15 @@ Working stack:
 `SignUp` 
 Contains two forms with the following fields:
 
-`form #1`:
-- сarBrand
-- zipCode
-`form #2`:
-- firstName
-- lastName
-- carModel
-- firstRegistration
+  `form #1`:
+  - сarBrand
+  - zipCode
+
+  `form #2`:
+  - firstName
+  - lastName
+  - carModel
+  - firstRegistration
 
 Each form has a  back button & next button, which takes a step behind\forward. 
 
