@@ -14,6 +14,14 @@
 // biggerNumber(111) = -1;
 // biggerNumber(531) = -1;
 
+// const num = 23;
+// const num = 624;
+// const num = 2018;
+// const num = 9;
+// const num = 111;
+// const num = 531;
+const num = 12687261528;
+
 function biggerNumber(num) {
   console.log('start num', num);
 
@@ -31,12 +39,5 @@ function biggerNumber(num) {
   return -1;
 }
 
-console.log('biggerNumber:', biggerNumber(
-  // 23
-  // 624
-  // 2018
-  // 9
-  // 111
-  // 531
-  12687261528
-));
+console.log('Task 3 -----------------------------------');
+console.log('biggerNumber()', biggerNumber(num));

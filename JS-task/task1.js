@@ -35,4 +35,5 @@ function sortString(str) {
     .join(' ')
 }
 
-console.log('sortString:', sortString(str));
+console.log('Task 1 -----------------------------------');
+console.log('sortString()', sortString(str));
