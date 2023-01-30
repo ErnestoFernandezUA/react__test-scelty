@@ -10,7 +10,7 @@ import { getAllUsers } from './api/users';
 import { User } from './type/User';
 import { PageForm1 } from './pages/PageForm1';
 import { PageForm2 } from './pages/PageForm2';
-import { ResultPage } from './pages/ResultPage';
+import { PageResult1 } from './pages/PageResult1';
 
 export async function rootLoader() {
   const response = await getAllUsers();
@@ -46,7 +46,7 @@ export const router = createHashRouter([
       },
       {
         path: "/result",
-        element: <ResultPage />,
+        element: <PageResult1 />,
         errorElement: <>Error on ResultPage</>,
       },
     ],
