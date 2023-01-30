@@ -57,7 +57,7 @@ function App() {
   return (
     <div className="App">
       <header className="App__Header">
-        <h1>React Template</h1>
+        <h1>React Pet Project</h1>
       </header>
 
       <main className="App__Container">
