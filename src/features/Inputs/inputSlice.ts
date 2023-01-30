@@ -40,7 +40,11 @@ export interface InputState {
   status: 'idle' | 'loading' | 'reject',
   errorMessage1: string,
   errorMessage2: string,
-  validationFails: InputsType<string[]>
+  validationFails: InputsType<string[]>,
+
+  isCorrectDataForm1: boolean, 
+  isCorrectDataForm2: boolean,
+  result: InputsType<string>,
 }
 
 const initialState: InputState = {
@@ -63,7 +67,18 @@ const initialState: InputState = {
     lastName: [],
     carModel: [],
     firstRegistration: [],
-  } 
+  },
+
+  isCorrectDataForm1: false, 
+  isCorrectDataForm2: false,
+  result: {
+    carBrand: '',
+    zipCode: '',
+    firstName: '',
+    lastName: '',
+    carModel: '',
+    firstRegistration: '',
+  }
 };
 
 export const validateAsyncForm1 = createAsyncThunk(
@@ -112,7 +127,7 @@ export const validateAsyncForm1 = createAsyncThunk(
           success: isValidInput,
           fails,
           message: isValidInput ? 'Data correct' : 'Data is not valid',
-        })
+        });
       }, DELAY));
   
       if (!response.success) {
@@ -121,18 +136,16 @@ export const validateAsyncForm1 = createAsyncThunk(
       
       return response;
     } catch (error) {
-      
+      return rejectWithValue(error);
     }
-
   },
 );
 
 export const validateAsyncForm2 = createAsyncThunk(
   'inputs/validateForm2',
   async (
-    // keys: keys as KeysForm1 | KeysForm2,
-      value:ValueForm2,
-    { rejectWithValue, getState },
+    value:ValueForm2,
+    { rejectWithValue },
     ) => {
     try {
       const response: {
@@ -168,7 +181,6 @@ export const validateAsyncForm2 = createAsyncThunk(
         //   }
         }
 
-
         res({
           success: isValidInput,
           fails,
@@ -198,6 +210,10 @@ const inputSlice = createSlice({
     }>) => {
       state.storage[action.payload.key as keyof InputsType<string>] = action.payload.value;
     },
+    setResult: (state) => {
+      state.result = state.storage;
+      state.storage = initialState.storage;
+    },
     resetState: (state: InputState) => {
       state = initialState;
     }
@@ -214,6 +230,8 @@ const inputSlice = createSlice({
       .addCase(validateAsyncForm1.fulfilled, (state: InputState, action) => {
         console.log('validateAsyncForm1.fulfilled', action);
         // state = initialState;
+        state.status = 'idle';
+        state.isCorrectDataForm1 = true;
       })
       .addCase(validateAsyncForm1.rejected, (
         state: InputState,
@@ -223,6 +241,7 @@ const inputSlice = createSlice({
         state.status = 'reject';
         state.errorMessage1 = action.payload.message;
         state.validationFails = {...state.validationFails, ...action.payload.fails};
+        state.isCorrectDataForm1 = false;
       })
 
       .addCase(validateAsyncForm2.pending, (state) => {
@@ -238,6 +257,8 @@ const inputSlice = createSlice({
         ) => {
         console.log('validateAsyncForm1.fulfilled', action);
         // state = initialState;
+        state.status = 'idle';
+        state.isCorrectDataForm2 = true;
       })
       .addCase(validateAsyncForm2.rejected, (
         state: InputState,
@@ -247,6 +268,7 @@ const inputSlice = createSlice({
         state.status = 'reject';
         state.errorMessage1 = action.payload.message;
         state.validationFails = {...state.validationFails, ...action.payload.fails};
+        state.isCorrectDataForm2 = false;
       })
   },
 });
@@ -254,6 +276,7 @@ const inputSlice = createSlice({
 export default inputSlice.reducer;
 export const {
   setInput,
+  setResult,
   resetState,
 } = inputSlice.actions;
 
@@ -262,3 +285,6 @@ export const selectIsLoading = (state: RootState) => state.inputs.status === 'lo
 export const selectIsReject = (state: RootState) => state.inputs.status === 'reject';
 export const selectValidations = (state: RootState) => state.inputs.validationFails;
 export const selectError = (state: RootState) => state.inputs.errorMessage1;
+export const selectIsCorrectDataForm1 = (state: RootState) => state.inputs.isCorrectDataForm1;
+export const selectIsCorrectDataForm2 = (state: RootState) => state.inputs.isCorrectDataForm2;
+export const selectResult = (state: RootState) => state.inputs.result;

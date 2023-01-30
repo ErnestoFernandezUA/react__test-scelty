@@ -1,17 +1,18 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import classNames from "classnames";
 import { ChangeEvent, FormEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
-import { selectInputs, selectValidations, setInput, validateAsyncForm2 } from "../../features/Inputs/inputSlice";
+import { selectInputs, selectIsCorrectDataForm1, selectIsCorrectDataForm2, selectIsLoading, selectValidations, setInput, setResult, validateAsyncForm2 } from "../../features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import './PageForm2.scss'
 
 
-const initialValues = {
-  firstName: '',
-  lastName: '',
-  carModel: '',
-  firstRegistration: '',
-};
+// const initialValues = {
+//   firstName: '',
+//   lastName: '',
+//   carModel: '',
+//   firstRegistration: '',
+// };
 
 const initialErrors = {
   firstName: [],
@@ -33,8 +34,8 @@ export type KeysForm2 = 'firstName' | 'lastName' | 'carModel' | 'firstRegistrati
 type ValueForm2 = {[key in KeysForm2]: string};
 type ValidData2 = {[key in KeysForm2]: string[]};
 type Error2 = {[key in KeysForm2]: string[]}
-type KeysForm1 = 'carBrand' | 'zipCode';
-type Error1 = {[key in KeysForm1]: string[]};
+// type KeysForm1 = 'carBrand' | 'zipCode';
+// type Error1 = {[key in KeysForm1]: string[]};
 
 export const PageForm2: FunctionComponent = () => {
   const valueStore = useAppSelector(selectInputs);
@@ -48,8 +49,13 @@ export const PageForm2: FunctionComponent = () => {
   });
   const [error, setError] = useState<Error2>(fails);
   const [message, setMessage] = useState<boolean>(false);
+  const [success, setSuccess] = useState(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const navigate = useNavigate();
+  const isLoading = useAppSelector(selectIsLoading);
+  const isCorrectDataForm1 = useAppSelector(selectIsCorrectDataForm1);
+  const isCorrectDataForm2 = useAppSelector(selectIsCorrectDataForm2);
+
 
   // const value = useAppSelector(selectInputs);
 
@@ -120,53 +126,49 @@ const isValid = () => {
     console.log('page2//', response);
 
     setMessage(response.payload.message);
+    setSuccess(response.payload.success);
     setShowPopup(true);
 
     if (response.payload.success) {
       setTimeout(() => {
         setShowPopup(false);
+        setSuccess(false);
 
         if (
-          Object.keys(fails).every(key => fails[key as keyof InputsType<string[]>].length === 0)
+          // Object.keys(fails).every(key => fails[key as keyof InputsType<string[]>].length === 0)
+          isCorrectDataForm1 && isCorrectDataForm2
         ) {
           console.log('to result');
+          dispatch(setResult());
           navigate('/result');
         }
       }, 2000)
     }
-
-    // if (isValid()) {
-    //   setTimeout(() => {
-    //     for(const key in value){
-    //       dispatch(setInput({
-    //         key: key as KeysForm2,
-    //         value: value[key as keyof ValueForm2]
-    //       }));
-    //     }
-
-
-    //     // setValue(initialValues);
-    //     navigate('/result');
-    //   }, 2000)
-    // } else {
-    //   console.log('show popup wrong data');
-    //   setShowPopup(true);
-    //   setTimeout(() => {
-    //     setShowPopup(false);
-    //   }, 3000)
-    // }
   };
-
 
   return (
     <div className="PageForm2">
-      <h1>Form 2</h1>
+      <div className="PageForm2__nav">
+        <Link to={'/form1'} className="PageForm1__button-back">
+          <button>Goto Form#1</button>
+        </Link>
+      </div>
+
+      <h2>Form 2</h2>
+
       {showPopup && (
-        <h3>{message}</h3>
+        <h3 className={classNames('PageForm2__message',
+          { 'PageForm2__message--success': success})}
+        >
+          {message}
+          </h3>
       )}
+
+      {isLoading && <p>Loading.....</p>}
+
       <form onSubmit={onSubmit}>
         {Object.keys(value).map(key => (
-          <div key={key}>
+          <div key={key} className="PageForm2__input-container">
             <label htmlFor={key}>
               {key}:&nbsp;
               <input
@@ -177,27 +179,28 @@ const isValid = () => {
                 onChange={onChange}
                 placeholder={`input ${key}`}
               />
-              </label>
-            <br />
-            <ul>
-              {fails[key as keyof Error2].map(e => (
-                <li key={e}>{e}</li>
-              ))}
-            </ul>
+
+              <ul>
+                {fails[key as keyof Error2].map(e => (
+                  <li key={e}>{e}</li>
+                  ))}
+              </ul>
+            </label>
           </div>
         ))}
 
         <button
           onClick={onSubmit}
+          className="PageForm1__input-submit"
         >
           Submit
         </button>
       </form>
       
 
-      <Link to={'/'}>Back</Link>
+      
       <br />
-      <Link to={'/form1'}>Form1</Link>
+      
     </div>
   );
 }

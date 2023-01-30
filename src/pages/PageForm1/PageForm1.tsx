@@ -1,7 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import classNames from "classnames";
 import React, { ChangeEvent, FunctionComponent, useRef, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { selectInputs, selectValidations, setInput, validateAsyncForm1 } from "../../features/Inputs/inputSlice";
+import { selectInputs, selectIsLoading, selectValidations, setInput, validateAsyncForm1 } from "../../features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import './PageForm1.scss'
 
@@ -31,8 +32,10 @@ export const PageForm1: FunctionComponent = () => {
   const [error, setError] = useState<Error1>(fails);
   const [message, setMessage] = useState<boolean>(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [success, setSuccess] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const isLoading = useAppSelector(selectIsLoading);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => { 
     setValue({
@@ -105,49 +108,47 @@ export const PageForm1: FunctionComponent = () => {
 
     console.log('page1//', response );
     setMessage(response.payload.message);
+    setSuccess(response.payload.success);
     setShowPopup(true);
 
     if (response.payload.success) {
       setTimeout(() => {
         setShowPopup(false);
+        setSuccess(false);
         navigate('/form2');
       }, 2000)
     }
-
-    // if (isValid()) {
-    //   setTimeout(() => {
-    //     for(const key in value){
-    //       dispatch(setInput({
-    //         key: key as KeysForm1,
-    //         value: value[key as keyof ValueForm1]
-    //       }));
-    //     }
-
-    //     // setValue(initialValues.current);
-    //     navigate('/form2');
-    //   }, 2000)
-    // } else {
-    //   console.log('show popup wrong data');
-    //   setShowPopup(true);
-    //   setTimeout(() => {
-    //     setShowPopup(false);
-    //   }, 3000)
-    // }
   };
 
   console.log(value, error);
 
   return (
     <div className="PageForm1">
+      <div className="PageForm1__nav">
+        <Link to={'/'} className="PageForm1__button-back">
+          <button>Back</button>
+        </Link>
+
+        <Link to={'/form2'}>
+          <button>Goto Form#2</button>
+        </Link>
+      </div>
+
       <h2>Form1</h2>
 
       {showPopup && (
-        <h3>{message}</h3>
+        <h3 className={classNames('PageForm1__message',
+          { 'PageForm1__message--success': success})}
+        >
+          {message}
+        </h3>
       )}
       
+      {isLoading && <p>Loading.....</p>}
+
       <form onSubmit={onSubmit}>
         {Object.keys(value).map(key => (
-          <div key={key}>
+          <div key={key} className="PageForm1__input-container">
             <label htmlFor={key}>
               {key}:&nbsp;
               <input
@@ -158,26 +159,31 @@ export const PageForm1: FunctionComponent = () => {
                 onChange={onChange}
                 placeholder={`input ${key}`}
               />
-              </label>
-            <br />
-            <ul>
-              {fails[key as keyof Error1].map(e => (
-                <li key={e}>{e}</li>
-              ))}
-            </ul>
+
+              <ul>
+                {fails[key as keyof Error1].map(e => (
+                  <li key={e}>{e}</li>
+                  ))}
+              </ul>
+            </label>
           </div>
         ))}
 
         <button
           onClick={onSubmit}
+          className="PageForm1__input-submit"
         >
           Submit
         </button>
       </form>
+        
+        <div className="PageForm1__correctData">
+          <p>Correct data</p><br/>
+          <p>CarBrand: bmw, audi, nissan</p><br/>
+          <p>zipCode: 65000, 66000, 67000, 68000</p>
+        </div>
+
       
-      <Link to={'/'}>Back</Link>
-      &nbsp;
-      <Link to={'/form2'}>Form2</Link>
 
 
     </div>

@@ -6,10 +6,19 @@ export const HomePage: FunctionComponent = () => {
 
   return (
     <div className="HomePage">
-      <h1>HomePage</h1>
+      <h1>Welcome!</h1>
 
-      <Link to={'/form1'}>Form1</Link>
+      <div className="HomePage__content">
+        <p>It's simple form with react-toolkit-thunk.</p>
+        <br />
+        <p>It simulate receiving validation fails from server.</p>
+        <br />
+        <p>If input data correct, user relocate to result page.</p>
+      </div>
 
+      
+      <Link to={'/form1'}><button>Goto Form#1</button></Link>
+      
       
     </div>
   );
