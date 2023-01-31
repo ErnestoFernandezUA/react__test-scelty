@@ -7,9 +7,9 @@ import {
 import {
   RootState,
 } from '../..';
-import { InputsType } from '../../../type/InputType';
+// import { InputsType } from '../../../type/InputType';
 import {
-  Error1, Error2, KeysForm1, KeysForm2, ValidData, ValidData1, ValidData2, ValueForm1, ValueForm2, Error, ValueForm, Value, KeysForm, 
+  Error1, Error2, KeysForm1, KeysForm2, ValidData, ValidData1, ValidData2, ValueForm1, ValueForm2, ErrorType, ValueForm, Value, KeysForm, InputsType, 
 } from '../../../type/Error';
 
 const validData: ValidData1 = {
@@ -39,21 +39,82 @@ const DELAY = 1000;
 //   firstRegistration: T,
 // }
 
-const validMatrix = (key: string) => ({
-  [key]: [
-    {applyRules: true, wrongMessage: `${key} is required!`},
-    {applyRules: true, wrongMessage: `value of ${key} is not valid!`},
-    ],
-  // carBrand: [
-  //   {applyRules: true, wrongMessage: `${key} is required!`},
-  //   {applyRules: true, wrongMessage: `value of ${key} is not valid!`},
-  //   ],
-  // zipCode: [true, false],
-  // firstName: [true, false],
-  // lastName: [true, false],
-  // carModel: [true, false],
-  // firstRegistration: [true, false],
-})
+const wrongMessage = (key:string) => {
+  switch (key) {
+    case 'carBrand':
+      return [`${key} is required!`,
+      `The brand ${key.toUpperCase()} is unfortunately not serviced.`];
+
+    case 'zipCode':
+      return [`${key} is required!`,
+      `Postal code ${key} is unfortunately not serviced.`];
+
+    default:
+      return [`${key} is required!`, `value of ${key} is not valid!`];
+  }
+};
+
+const wrongMessageOBJ = (value: InputsType<string>, key:string):{applyRules: boolean, wrongMessage: string}[] => {
+  switch (key) {
+    case 'carBrand':
+      return [
+        {
+          applyRules: true,
+          wrongMessage: `${key} is required!`,
+        },
+        { applyRules: true,
+          wrongMessage: `The brand ${value[key]!.toUpperCase() || '***'} is unfortunately not serviced.`
+        },
+      ];
+
+    case 'zipCode':
+      return [
+        {
+          applyRules: true,
+          wrongMessage: `${key} is required!`,
+        },
+        { applyRules: true,
+          wrongMessage: `Postal code ${key} is unfortunately not serviced.`,
+        },
+      ];
+
+    default:
+      return [
+        {
+          applyRules: true,
+          wrongMessage: `${key} is required!`,
+        },
+        { 
+          applyRules: false,
+          wrongMessage: '',
+        },
+      ];
+  }
+};
+
+// const validMatrix: Value<KeysForm, {applyRules: boolean, wrongMessage: string}[]> = {
+//   carBrand: wrongMessageOBJ('carBrand'),
+//   zipCode: [
+//     {applyRules: true, wrongMessage: wrongMessage('zipCode')[0]},
+//     {applyRules: true, wrongMessage: wrongMessage('zipCode')[1]},
+//     ],
+//   firstName: [
+//     {applyRules: true, wrongMessage: wrongMessage('firstName')[0]},
+//     {applyRules: false, wrongMessage: ''},
+//     ],
+//   lastName: [
+//     {applyRules: true, wrongMessage: wrongMessage('lastName')[0]},
+//     {applyRules: false, wrongMessage: ''},
+//     ],
+//   carModel: [
+//     {applyRules: true, wrongMessage: wrongMessage('carModel')[0]},
+//     {applyRules: false, wrongMessage: ''},
+//     ],
+//   firstRegistration: [
+//     {applyRules: true, wrongMessage: wrongMessage('firstRegistration')[0]},
+//     {applyRules: false, wrongMessage: ''},
+//     ],
+// };
 
 export interface InputState {
   storage: InputsType<string>,
@@ -62,6 +123,8 @@ export interface InputState {
   errorMessage1: string,
   errorMessage2: string,
   validationFails: InputsType<string[]>,
+
+  isCorrect: InputsType<boolean>,
 
   isCorrectDataForm1: boolean, 
   result: InputsType<string>,
@@ -87,6 +150,15 @@ const initialState: InputState = {
     lastName: [],
     carModel: [],
     firstRegistration: [],
+  },
+
+  isCorrect: {
+    carBrand: false,
+    zipCode: false,
+    firstName: false,
+    lastName: false,
+    carModel: false,
+    firstRegistration: false,
   },
 
   isCorrectDataForm1: false, 
@@ -246,26 +318,37 @@ export const validateAsync = createAsyncThunk(
         };
 
         for(const key in value){
-          if (!value[key as keyof Value<KeysForm, string>]) {
+          if (!value[key as keyof Value<KeysForm, string>]
+            // && validMatrix[key as keyof Value<KeysForm, {applyRules: boolean, wrongMessage: string}[]>]![0].applyRules 
+            && wrongMessageOBJ(value, key)[0].applyRules
+            ){
             console.log(value[key as keyof Value<KeysForm, string>]);
 
-            fails[key as keyof Error] = [
+            fails[key as keyof ErrorType] = [
               ...fails[key as keyof Value<KeysForm, string[]>]!,
-               `${key} is required!`,
+              //  `${key} is required!`,
+               wrongMessageOBJ(value, key)[0].wrongMessage,
             ];
 
             isValidInput = false;
           }
 
-          if (!(validDataAll[key as keyof Value<KeysForm, string[]>]!)
+          console.log('validDataAll[key as keyof Value<KeysForm, string[]>]! = ',
+          key,
+          validDataAll[key as keyof Value<KeysForm, string[]>]!);
+
+          if (wrongMessageOBJ(value, key)[1].applyRules && !validDataAll[key as keyof Value<KeysForm, string[]>]!
             .some((el: string) => 
-            el.toLowerCase() === value[key as keyof Value<KeysForm, string>]!.toLowerCase())) {
+            el.toLowerCase() === value[key as keyof Value<KeysForm, string>]!.toLowerCase())
+            // && validMatrix[key as keyof Value<KeysForm, {applyRules: boolean, wrongMessage: string}[]>]![1].applyRules
+            ) {
               fails[key as keyof Value<KeysForm, string[]>] = [
                 ...fails[key as keyof Value<KeysForm, string[]>]!,
-                `value of ${key} is not valid!`,
+                // `value of ${key} is not valid!`,
+                wrongMessageOBJ(value, key)[1].wrongMessage,
               ];
 
-            isValidInput = false;
+              isValidInput = false;
           }
         }
 
@@ -357,6 +440,36 @@ const inputSlice = createSlice({
         state.status = 'reject';
         state.errorMessage1 = action.payload.message;
         state.validationFails = {...state.validationFails, ...action.payload.fails};
+      })
+
+      .addCase(validateAsync.pending, (state: InputState) => {
+        console.log('validateAsync.pending');
+
+        // state.isCorrectDataForm1 = false;
+        state.status = 'loading';
+        state.errorMessage1 = initialState.errorMessage1;
+        // state.validationFails = initialState.validationFails;
+      })
+      .addCase(validateAsync.fulfilled, (state: InputState, action) => {
+        console.log('validateAsync.fulfilled', action);
+        state.status = 'idle';
+        state.isCorrectDataForm1 = true;
+
+        console.log('action.meta.arg', action.meta.arg);
+
+        Object.keys(action.meta.arg).forEach(key => {
+          state.isCorrect[key as keyof InputsType<boolean>] = true;
+        });
+      })
+      .addCase(validateAsync.rejected, (
+        state: InputState,
+        action: any) => {
+        console.log('validateAsync.rejected', action);
+
+        state.status = 'reject';
+        state.errorMessage1 = action.payload.message;
+        state.validationFails = {...state.validationFails, ...action.payload.fails};
+        state.isCorrectDataForm1 = false;
       })
   },
 });

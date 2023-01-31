@@ -2,17 +2,17 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import classNames from "classnames";
 import { ChangeEvent, FormEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
-import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsyncForm2 } from "../../store/features/Inputs/inputSlice";
+import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsync, validateAsyncForm2 } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { Error2, KeysForm2, ValidData2, ValueForm2 } from "../../type/Error";
+import { ErrorType, KeysForm2, ValidData2, ValueForm, ValueForm2 } from "../../type/Error";
 import './PageForm2.scss'
 
-const initialErrors = {
-  firstName: [],
-  lastName: [],
-  carModel: [],
-  firstRegistration: [],
-};
+// const initialErrors = {
+//   firstName: [],
+//   lastName: [],
+//   carModel: [],
+//   firstRegistration: [],
+// };
 
 // export type KeysForm2 = 'firstName' | 'lastName' | 'carModel' | 'firstRegistration';
 // type ValueForm2 = {[key in KeysForm2]: string};
@@ -23,13 +23,13 @@ export const PageForm2: FunctionComponent = () => {
   const valueStore = useAppSelector(selectInputs);
   const fails = useAppSelector(selectValidations);
   const dispatch = useAppDispatch();
-  const [value, setValue] = useState<ValueForm2>({
+  const [value, setValue] = useState<ValueForm>({
     firstName: valueStore.firstName,
     lastName: valueStore.lastName,
     carModel: valueStore.carModel,
     firstRegistration: valueStore.firstRegistration,
   });
-  const [error, setError] = useState<Error2>(fails);
+  // const [error, setError] = useState<Error2>(fails);
   const [message, setMessage] = useState<boolean>(false);
   const [success, setSuccess] = useState(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);
@@ -45,34 +45,34 @@ export const PageForm2: FunctionComponent = () => {
     [e.target.name]: e.target.value,
   });
 
-  setError({
-    ...error,
-    [e.target.name]: initialErrors[e.target.name as keyof Error2],
-  })
+  // setError({
+  //   ...error,
+  //   [e.target.name]: initialErrors[e.target.name as keyof Error2],
+  // })
 };
 
-const isValid = () => {
-  setError(initialErrors);
-  let isValidInput = true;
+// const isValid = () => {
+//   setError(initialErrors);
+//   let isValidInput = true;
 
-  for(const key in value){
-    if (!value[key as keyof ValueForm2]) {
-      setError(error => ({
-        ...error,
-        [key as keyof Error2]:[...error[key as keyof Error2], `${key} is required!`],
-      }));
-      isValidInput = false;
-    }
-  }
+//   for(const key in value){
+//     if (!value[key as keyof ValueForm2]) {
+//       setError(error => ({
+//         ...error,
+//         [key as keyof Error2]:[...error[key as keyof Error2], `${key} is required!`],
+//       }));
+//       isValidInput = false;
+//     }
+//   }
 
-  console.log('isValidInput', isValidInput);
+//   console.log('isValidInput', isValidInput);
 
-  if (!isValidInput) {
-    console.log('is not valid!');
-  }
+//   if (!isValidInput) {
+//     console.log('is not valid!');
+//   }
 
-  return isValidInput;
-};
+//   return isValidInput;
+// };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ const isValid = () => {
     for(const key in value){
       dispatch(setInput({
         key: key as KeysForm2,
-        value: value[key as keyof ValueForm2]
+        value: value[key as keyof ValueForm]
       }));
     }
 
@@ -90,13 +90,13 @@ const isValid = () => {
           fails: ValidData2;
           message: string;
       } | undefined, string, {
-          arg: ValueForm2;
+          arg: ValueForm;
           requestId: string;
           requestStatus: "fulfilled";
       }, never> | {
           payload: any;
           type: string;
-      } = await dispatch(validateAsyncForm2(value));
+      } = await dispatch(validateAsync(value));
 
     console.log('page2//', response);
 
@@ -153,13 +153,13 @@ const isValid = () => {
                 id={key}
                 type="text"
                 name={key}
-                value={value[key as keyof ValueForm2]}
+                value={value[key as keyof ValueForm]}
                 onChange={onChange}
                 placeholder={`input ${key}`}
               />
 
               <ul>
-                {fails[key as keyof Error2].map(e => (
+                {fails[key as keyof ErrorType]!.map((e: string) => (
                   <li key={e}>{e}</li>
                   ))}
               </ul>
