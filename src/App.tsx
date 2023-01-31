@@ -1,31 +1,18 @@
-import React, { useEffect } from 'react';
-import { createHashRouter, Outlet, useLoaderData } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { getPostsAsync, selectPosts } from './features/Posts/postsSlice';
+import React from 'react';
+import { createHashRouter, Outlet } from 'react-router-dom'
 import './App.scss';
 import { NotFound } from './pages/NotFound';
 import { HomePage } from './pages/HomePage/HomePage';
-import { PostPage } from './pages/PostPage/PostPage';
-import { getAllUsers } from './api/users';
-import { User } from './type/User';
 import { PageForm1 } from './pages/PageForm1';
 import { PageForm2 } from './pages/PageForm2';
 import { PageResult1 } from './pages/PageResult1';
-
-export async function rootLoader() {
-  const response = await getAllUsers();
-
-  return response;
-}
-
-// localStorage.clear();
+import { PageResult2 } from './pages/PageResult2';
 
 export const router = createHashRouter([
   {
     path: "/",
     element: <App />,
     errorElement: <NotFound />,
-    loader: rootLoader,
     id: "root",
     children: [
       {
@@ -45,9 +32,14 @@ export const router = createHashRouter([
         errorElement: <>Error on Form2Page</>,
       },
       {
-        path: "/result",
+        path: "/result1",
         element: <PageResult1 />,
-        errorElement: <>Error on ResultPage</>,
+        errorElement: <>Error on ResultPage1</>,
+      },
+      {
+        path: "/result2",
+        element: <PageResult2 />,
+        errorElement: <>Error on ResultPage2</>,
       },
     ],
   },

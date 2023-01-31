@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import './HomePage.scss'
  
 export const HomePage: FunctionComponent = () => {
-
   return (
     <div className="HomePage">
       <h1>Welcome!</h1>
@@ -15,10 +14,8 @@ export const HomePage: FunctionComponent = () => {
         <br />
         <p>If input data correct, user relocate to result page.</p>
       </div>
-
       
       <Link to={'/form1'}><button>Goto Form#1</button></Link>
-      
       
     </div>
   );

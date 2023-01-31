@@ -2,17 +2,10 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import classNames from "classnames";
 import { ChangeEvent, FormEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
-import { selectInputs, selectIsCorrectDataForm1, selectIsCorrectDataForm2, selectIsLoading, selectValidations, setInput, setResult, validateAsyncForm2 } from "../../features/Inputs/inputSlice";
+import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsyncForm2 } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { Error2, KeysForm2, ValidData2, ValueForm2 } from "../../type/Error";
 import './PageForm2.scss'
-
-
-// const initialValues = {
-//   firstName: '',
-//   lastName: '',
-//   carModel: '',
-//   firstRegistration: '',
-// };
 
 const initialErrors = {
   firstName: [],
@@ -21,21 +14,10 @@ const initialErrors = {
   firstRegistration: [],
 };
 
-interface InputsType<T> {
-  carBrand: T,
-  zipCode: T,
-  firstName: T,
-  lastName: T,
-  carModel: T,
-  firstRegistration: T,
-}
-
-export type KeysForm2 = 'firstName' | 'lastName' | 'carModel' | 'firstRegistration';
-type ValueForm2 = {[key in KeysForm2]: string};
-type ValidData2 = {[key in KeysForm2]: string[]};
-type Error2 = {[key in KeysForm2]: string[]}
-// type KeysForm1 = 'carBrand' | 'zipCode';
-// type Error1 = {[key in KeysForm1]: string[]};
+// export type KeysForm2 = 'firstName' | 'lastName' | 'carModel' | 'firstRegistration';
+// type ValueForm2 = {[key in KeysForm2]: string};
+// type ValidData2 = {[key in KeysForm2]: string[]};
+// type Error2 = {[key in KeysForm2]: string[]}
 
 export const PageForm2: FunctionComponent = () => {
   const valueStore = useAppSelector(selectInputs);
@@ -54,16 +36,10 @@ export const PageForm2: FunctionComponent = () => {
   const navigate = useNavigate();
   const isLoading = useAppSelector(selectIsLoading);
   const isCorrectDataForm1 = useAppSelector(selectIsCorrectDataForm1);
-  const isCorrectDataForm2 = useAppSelector(selectIsCorrectDataForm2);
-
-
-  // const value = useAppSelector(selectInputs);
+  const coin = Math.random() < 0.5;
+  const [showStepLoader, setShowStepLoader] = useState<boolean>(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-  // dispatch(setInput({
-  //   key: e.target.name as KeysForm2,
-  //   value: e.target.value as any,
-  // }));
   setValue({
     ...value,
     [e.target.name]: e.target.value,
@@ -122,7 +98,6 @@ const isValid = () => {
           type: string;
       } = await dispatch(validateAsyncForm2(value));
 
-
     console.log('page2//', response);
 
     setMessage(response.payload.message);
@@ -130,31 +105,34 @@ const isValid = () => {
     setShowPopup(true);
 
     if (response.payload.success) {
-      setTimeout(() => {
-        setShowPopup(false);
-        setSuccess(false);
+      setShowStepLoader(true);
 
-        if (
-          // Object.keys(fails).every(key => fails[key as keyof InputsType<string[]>].length === 0)
-          isCorrectDataForm1 && isCorrectDataForm2
-        ) {
-          console.log('to result');
-          dispatch(setResult());
-          navigate('/result');
+      setTimeout(() => {
+        if (isCorrectDataForm1) {
+          setTimeout(() => {
+            setShowPopup(false);
+            setSuccess(false);
+            console.log('to result');
+            dispatch(setResult());
+            navigate(coin ? '/result1' : '/result2');
+            setShowStepLoader(false);
+          }, 6000)
         }
-      }, 2000)
+      }, 1000)
     }
   };
 
   return (
     <div className="PageForm2">
       <div className="PageForm2__nav">
-        <Link to={'/form1'} className="PageForm1__button-back">
+        <Link to={'/form1'} className="PageForm2__button-back">
           <button>Goto Form#1</button>
         </Link>
       </div>
 
       <h2>Form 2</h2>
+
+      {showStepLoader && <div className="PageForm2__StepLoader">StepLoader</div>}
 
       {showPopup && (
         <h3 className={classNames('PageForm2__message',
@@ -192,15 +170,11 @@ const isValid = () => {
         <button
           onClick={onSubmit}
           className="PageForm1__input-submit"
+          disabled={isLoading}
         >
           Submit
         </button>
       </form>
-      
-
-      
-      <br />
-      
     </div>
   );
 }

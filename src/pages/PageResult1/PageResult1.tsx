@@ -1,6 +1,6 @@
-import React, { ChangeEvent, FunctionComponent, useState } from "react";
+import React, { ChangeEvent, FunctionComponent, useEffect, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { selectInputs, selectResult, setInput } from "../../features/Inputs/inputSlice";
+import { clearState, selectInputs, selectResult, setInput } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import './PageResult1.scss'
 
@@ -13,9 +13,18 @@ interface InputsType<T> {
   firstRegistration: T,
 }
 
+localStorage.clear();
+
 export const PageResult1: FunctionComponent = () => {
   const result = useAppSelector(selectResult) as InputsType<string>;
-  const coin = Math.random() < 0.5;
+  const dispatch= useAppDispatch();
+
+  useEffect(() => {
+    return () => {
+      console.log('unmount');
+      dispatch(clearState());
+    }
+  });
   
   return (
     <div className="PageResult1">
@@ -34,28 +43,14 @@ export const PageResult1: FunctionComponent = () => {
           <button>Goto Form#2</button>
         </Link>
       </div>
-      
 
-      {coin ? (
-        <div>
-          <h3>Result 1</h3>
+      <div>
+        <h3>Result 1</h3>
 
-          {Object.keys(result).map(key => (
-            <div key={key}>{`${key}`}: {result[key as keyof InputsType<string>]}</div>
-          ))}
-        </div>
-      ) : (
-        <div>
-          <h3>Result 2</h3>
-
-          <div>{`FullName: ${result.firstName} ${result.lastName}`}</div>
-          <div>{`Car: ${result.carModel} ${result.carBrand}`}</div>
-        </div>
-      )}
-
-
-
-      
+        {Object.keys(result).map(key => (
+          <div key={key}>{`${key}`}: {result[key as keyof InputsType<string>]}</div>
+        ))}
+      </div>
     </div>
   );
 }

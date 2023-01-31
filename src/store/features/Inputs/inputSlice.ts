@@ -2,37 +2,58 @@ import {
   createAsyncThunk,
   createSlice,
   PayloadAction,
-  SerializedError,
 } from '@reduxjs/toolkit';
-import { getAllPosts } from '../../api/post';
-import { KeysForm1 } from '../../pages/PageForm1';
-import { KeysForm2 } from '../../pages/PageForm2';
 // eslint-disable-next-line import/no-cycle
 import {
   RootState,
-} from '../../store';
+} from '../..';
+import { InputsType } from '../../../type/InputType';
+import {
+  Error1, Error2, KeysForm1, KeysForm2, ValidData, ValidData1, ValidData2, ValueForm1, ValueForm2, Error, ValueForm, Value, KeysForm, 
+} from '../../../type/Error';
 
 const validData: ValidData1 = {
   carBrand: ['Audi', 'BMW', 'Nissan'],
   zipCode: ['65000', '66000', '67000', '68000'],
 }
 
-const DELAY = 3000;
-type ValidData1 = {[key in KeysForm1]: string[]};
-type ValidData2 = {[key in KeysForm2]: string[]};
-type ValueForm1 = {[key in KeysForm1]: string};
-type ValueForm2 = {[key in KeysForm2]: string};
-type Error1 = {[key in KeysForm1]: string[]};
-type Error2 = {[key in KeysForm2]: string[]};
-
-interface InputsType<T> {
-  carBrand: T,
-  zipCode: T,
-  firstName: T,
-  lastName: T,
-  carModel: T,
-  firstRegistration: T,
+const validDataAll: ValidData = {
+  carBrand: ['Audi', 'BMW', 'Nissan'],
+  zipCode: ['65000', '66000', '67000', '68000'],
 }
+
+const DELAY = 1000;
+// type ValidData1 = {[key in KeysForm1]: string[]};
+// type ValidData2 = {[key in KeysForm2]: string[]};
+// type ValueForm1 = {[key in KeysForm1]: string};
+// type ValueForm2 = {[key in KeysForm2]: string};
+// type Error1 = {[key in KeysForm1]: string[]};
+// type Error2 = {[key in KeysForm2]: string[]};
+
+// interface InputsType<T> {
+//   carBrand: T,
+//   zipCode: T,
+//   firstName: T,
+//   lastName: T,
+//   carModel: T,
+//   firstRegistration: T,
+// }
+
+const validMatrix = (key: string) => ({
+  [key]: [
+    {applyRules: true, wrongMessage: `${key} is required!`},
+    {applyRules: true, wrongMessage: `value of ${key} is not valid!`},
+    ],
+  // carBrand: [
+  //   {applyRules: true, wrongMessage: `${key} is required!`},
+  //   {applyRules: true, wrongMessage: `value of ${key} is not valid!`},
+  //   ],
+  // zipCode: [true, false],
+  // firstName: [true, false],
+  // lastName: [true, false],
+  // carModel: [true, false],
+  // firstRegistration: [true, false],
+})
 
 export interface InputState {
   storage: InputsType<string>,
@@ -43,7 +64,6 @@ export interface InputState {
   validationFails: InputsType<string[]>,
 
   isCorrectDataForm1: boolean, 
-  isCorrectDataForm2: boolean,
   result: InputsType<string>,
 }
 
@@ -70,7 +90,6 @@ const initialState: InputState = {
   },
 
   isCorrectDataForm1: false, 
-  isCorrectDataForm2: false,
   result: {
     carBrand: '',
     zipCode: '',
@@ -200,6 +219,74 @@ export const validateAsyncForm2 = createAsyncThunk(
   },
 );
 
+export const validateAsync = createAsyncThunk(
+  'inputs/validateFormAll',
+  async (
+      value:Value<KeysForm, string>,
+    { rejectWithValue, getState },
+    ) => {
+    const state =  getState() as RootState;
+
+    try {
+      const response: {
+        success: boolean,
+        fails: Value<KeysForm, string[]>,
+        message: string,
+      } = await new Promise(res => setTimeout(() => {
+        let isValidInput = true;
+
+        const fails: Value<KeysForm, string[]> = {
+          ...state.inputs.validationFails,
+          // carBrand: [],
+          // zipCode: [],
+          // firstName: [],
+          // lastName: [],
+          // carModel: [],
+          // firstRegistration: [],
+        };
+
+        for(const key in value){
+          if (!value[key as keyof Value<KeysForm, string>]) {
+            console.log(value[key as keyof Value<KeysForm, string>]);
+
+            fails[key as keyof Error] = [
+              ...fails[key as keyof Value<KeysForm, string[]>]!,
+               `${key} is required!`,
+            ];
+
+            isValidInput = false;
+          }
+
+          if (!(validDataAll[key as keyof Value<KeysForm, string[]>]!)
+            .some((el: string) => 
+            el.toLowerCase() === value[key as keyof Value<KeysForm, string>]!.toLowerCase())) {
+              fails[key as keyof Value<KeysForm, string[]>] = [
+                ...fails[key as keyof Value<KeysForm, string[]>]!,
+                `value of ${key} is not valid!`,
+              ];
+
+            isValidInput = false;
+          }
+        }
+
+        res({
+          success: isValidInput,
+          fails,
+          message: isValidInput ? 'Data correct' : 'Data is not valid',
+        });
+      }, DELAY));
+  
+      if (!response.success) {
+        return rejectWithValue(response);
+      }
+      
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 const inputSlice = createSlice({
   name: 'inputs',
   initialState,
@@ -214,8 +301,12 @@ const inputSlice = createSlice({
       state.result = state.storage;
       state.storage = initialState.storage;
     },
-    resetState: (state: InputState) => {
-      state = initialState;
+    clearState: (state: InputState) => {
+      console.log('resetState');
+
+      state.result = initialState.result;
+      state.isCorrectDataForm1 = initialState.isCorrectDataForm1;
+      state.validationFails = initialState.validationFails;
     }
   },
   extraReducers: (builder) => {
@@ -223,13 +314,13 @@ const inputSlice = createSlice({
       .addCase(validateAsyncForm1.pending, (state: InputState) => {
         console.log('fetchAsync.pending');
 
+        state.isCorrectDataForm1 = false;
         state.status = 'loading';
         state.errorMessage1 = initialState.errorMessage1;
-        state.validationFails = initialState.validationFails
+        // state.validationFails = initialState.validationFails;
       })
       .addCase(validateAsyncForm1.fulfilled, (state: InputState, action) => {
         console.log('validateAsyncForm1.fulfilled', action);
-        // state = initialState;
         state.status = 'idle';
         state.isCorrectDataForm1 = true;
       })
@@ -249,16 +340,14 @@ const inputSlice = createSlice({
 
         state.status = 'loading';
         state.errorMessage2 = initialState.errorMessage2;
-        state.validationFails = initialState.validationFails
+        // state.validationFails = initialState.validationFails;
       })
       .addCase(validateAsyncForm2.fulfilled, (
         state: InputState,
         action: any
         ) => {
         console.log('validateAsyncForm1.fulfilled', action);
-        // state = initialState;
         state.status = 'idle';
-        state.isCorrectDataForm2 = true;
       })
       .addCase(validateAsyncForm2.rejected, (
         state: InputState,
@@ -268,7 +357,6 @@ const inputSlice = createSlice({
         state.status = 'reject';
         state.errorMessage1 = action.payload.message;
         state.validationFails = {...state.validationFails, ...action.payload.fails};
-        state.isCorrectDataForm2 = false;
       })
   },
 });
@@ -277,7 +365,7 @@ export default inputSlice.reducer;
 export const {
   setInput,
   setResult,
-  resetState,
+  clearState,
 } = inputSlice.actions;
 
 export const selectInputs = (state: RootState) => state.inputs.storage;
@@ -286,5 +374,4 @@ export const selectIsReject = (state: RootState) => state.inputs.status === 'rej
 export const selectValidations = (state: RootState) => state.inputs.validationFails;
 export const selectError = (state: RootState) => state.inputs.errorMessage1;
 export const selectIsCorrectDataForm1 = (state: RootState) => state.inputs.isCorrectDataForm1;
-export const selectIsCorrectDataForm2 = (state: RootState) => state.inputs.isCorrectDataForm2;
 export const selectResult = (state: RootState) => state.inputs.result;

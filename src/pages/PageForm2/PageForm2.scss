@@ -19,7 +19,6 @@
   & form {
     display: flex;
     flex-direction: column;
-    // align-items: end;
   }
 
   &__message {
@@ -62,8 +61,6 @@
       box-sizing: border-box;
     }
   }
-
-
 
   &__button-back {
     align-self: flex-start;

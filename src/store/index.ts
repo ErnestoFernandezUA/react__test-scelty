@@ -15,14 +15,10 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import inputSlice from '../features/Inputs/inputSlice';
-
-// eslint-disable-next-line import/no-cycle
-import postsReducer from '../features/Posts/postsSlice';
+import inputSlice from './features/Inputs/inputSlice';
 
 const rootReducer = combineReducers({
   inputs: inputSlice, 
-  posts: postsReducer,
 });
 
 const persistConfig = {

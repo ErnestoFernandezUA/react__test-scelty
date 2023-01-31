@@ -1,9 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import classNames from "classnames";
-import React, { ChangeEvent, FunctionComponent, useRef, useState } from "react";
+import React, { ChangeEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { selectInputs, selectIsLoading, selectValidations, setInput, validateAsyncForm1 } from "../../features/Inputs/inputSlice";
+import { selectInputs, selectIsLoading, selectValidations, setInput, validateAsyncForm1 } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { Error1, KeysForm1, ValidData1, ValueForm1 } from "../../type/Error";
 import './PageForm1.scss'
 
 const initialErrors = {
@@ -11,10 +12,10 @@ const initialErrors = {
   zipCode: [],
 };
 
-export type KeysForm1 = 'carBrand' | 'zipCode';
-type ValidData1 = {[key in KeysForm1]: string[]};
-type ValueForm1 = {[key in KeysForm1]: string};
-type Error1 = {[key in KeysForm1]: string[]};
+// export type KeysForm1 = 'carBrand' | 'zipCode';
+// type ValidData1 = {[key in KeysForm1]: string[]};
+// type ValueForm1 = {[key in KeysForm1]: string};
+// type Error1 = {[key in KeysForm1]: string[]};
 
 
 const validData: ValidData1 = {
@@ -29,6 +30,7 @@ export const PageForm1: FunctionComponent = () => {
     carBrand: valueStore.carBrand,
     zipCode: valueStore.zipCode,
   });
+  const [showFails, setShowFails] = useState({});
   const [error, setError] = useState<Error1>(fails);
   const [message, setMessage] = useState<boolean>(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);
@@ -71,8 +73,6 @@ export const PageForm1: FunctionComponent = () => {
         isValidInput = false;
       }
     }
-
-    console.log('isValidInput', isValidInput);
 
     if (!isValidInput) {
       console.log('is not valid!');
@@ -119,8 +119,6 @@ export const PageForm1: FunctionComponent = () => {
       }, 2000)
     }
   };
-
-  console.log(value, error);
 
   return (
     <div className="PageForm1">
@@ -172,6 +170,7 @@ export const PageForm1: FunctionComponent = () => {
         <button
           onClick={onSubmit}
           className="PageForm1__input-submit"
+          disabled={isLoading}
         >
           Submit
         </button>
