@@ -5,52 +5,11 @@ import {
 } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../..';
+import { validationObject } from '../../../server/helpers/validationObject';
 import { FormObject, Keys } from '../../../type/FormObject';
+import { validData } from '../../../server/helpers/validData';
 
 const DELAY = 1000;
-
-const validData: FormObject<Keys, string[]> = {
-  carBrand: ['Audi', 'BMW', 'Nissan'],
-  zipCode: ['65000', '66000', '67000', '68000'],
-}
-
-const wrongMessageOBJ = (value: FormObject<Keys, string>, key:string):{applyRules: boolean, wrongMessage: string}[] => {
-  switch (key) {
-    case 'carBrand':
-      return [
-        {
-          applyRules: true,
-          wrongMessage: `${key} is required!`,
-        },
-        { applyRules: true,
-          wrongMessage: `The brand ${value[key]!.toUpperCase() || 'NO_VALUE'} is unfortunately not serviced.`
-        },
-      ];
-
-    case 'zipCode':
-      return [
-        {
-          applyRules: true,
-          wrongMessage: `${key} is required!`,
-        },
-        { applyRules: true,
-          wrongMessage: `Postal code ${value[key]!.toUpperCase() || 'NO_VALUE'} is unfortunately not serviced.`,
-        },
-      ];
-
-    default:
-      return [
-        {
-          applyRules: true,
-          wrongMessage: `${key} is required!`,
-        },
-        { 
-          applyRules: false,
-          wrongMessage: '',
-        },
-      ];
-  }
-};
 
 export interface InputState {
   storage: FormObject<Keys, string>,
@@ -134,25 +93,25 @@ export const validateAsync = createAsyncThunk(
           fails[key as keyof FormObject<Keys, string>] = [];
 
           if (!value[key as keyof FormObject<Keys, string>]
-            && wrongMessageOBJ(value, key)[0].applyRules
+            && validationObject(value, key)[0].applyRules
             ){
             console.log(value[key as keyof FormObject<Keys, string>]);
 
             fails[key as keyof FormObject<Keys, string[]>] = [
               ...fails[key as keyof FormObject<Keys, string[]>]!,
-               wrongMessageOBJ(value, key)[0].wrongMessage,
+               validationObject(value, key)[0].wrongMessage,
             ];
 
             isValidInput = false;
           }
 
-          if (wrongMessageOBJ(value, key)[1].applyRules && !validData[key as keyof FormObject<Keys, string[]>]!
+          if (validationObject(value, key)[1].applyRules && !validData[key as keyof FormObject<Keys, string[]>]!
             .some((el: string) => 
             el.toLowerCase() === value[key as keyof FormObject<Keys, string>]!.toLowerCase())
             ) {
               fails[key as keyof FormObject<Keys, string[]>] = [
                 ...fails[key as keyof FormObject<Keys, string[]>]!,
-                wrongMessageOBJ(value, key)[1].wrongMessage,
+                validationObject(value, key)[1].wrongMessage,
               ];
 
               isValidInput = false;

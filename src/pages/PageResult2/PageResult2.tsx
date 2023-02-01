@@ -5,8 +5,6 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { FormObject, Keys } from "../../type/FormObject";
 import './PageResult2.scss'
 
-
-
 export const PageResult2: FunctionComponent = () => {
   const result = useAppSelector(selectResult) as FormObject<Keys, string>;
   const dispatch = useAppDispatch();
