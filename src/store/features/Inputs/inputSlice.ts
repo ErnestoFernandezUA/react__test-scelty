@@ -5,17 +5,16 @@ import {
 } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../..';
-import { ValidData, ErrorType, FormObject, Keys, InputsType, 
-} from '../../../type/FormObject';
+import { FormObject, Keys } from '../../../type/FormObject';
 
 const DELAY = 1000;
 
-const validData: ValidData = {
+const validData: FormObject<Keys, string[]> = {
   carBrand: ['Audi', 'BMW', 'Nissan'],
   zipCode: ['65000', '66000', '67000', '68000'],
 }
 
-const wrongMessageOBJ = (value: InputsType<string>, key:string):{applyRules: boolean, wrongMessage: string}[] => {
+const wrongMessageOBJ = (value: FormObject<Keys, string>, key:string):{applyRules: boolean, wrongMessage: string}[] => {
   switch (key) {
     case 'carBrand':
       return [
@@ -54,17 +53,17 @@ const wrongMessageOBJ = (value: InputsType<string>, key:string):{applyRules: boo
 };
 
 export interface InputState {
-  storage: InputsType<string>,
+  storage: FormObject<Keys, string>,
 
   status: 'idle' | 'loading' | 'reject',
   errorMessage1: string,
   errorMessage2: string,
-  validationFails: InputsType<string[]>,
+  validationFails: FormObject<Keys, string[]>,
 
-  isCorrect: InputsType<boolean>,
+  isCorrect: FormObject<Keys, boolean>,
 
   isCorrectDataForm1: boolean, 
-  result: InputsType<string>,
+  result: FormObject<Keys, string>,
 }
 
 const initialState: InputState = {
@@ -139,7 +138,7 @@ export const validateAsync = createAsyncThunk(
             ){
             console.log(value[key as keyof FormObject<Keys, string>]);
 
-            fails[key as keyof ErrorType] = [
+            fails[key as keyof FormObject<Keys, string[]>] = [
               ...fails[key as keyof FormObject<Keys, string[]>]!,
                wrongMessageOBJ(value, key)[0].wrongMessage,
             ];
@@ -186,7 +185,7 @@ const inputSlice = createSlice({
       key: Keys,
       value: any,
     }>) => {
-      state.storage[action.payload.key as keyof InputsType<string>] = action.payload.value;
+      state.storage[action.payload.key as keyof FormObject<Keys, string>] = action.payload.value;
     },
     setResult: (state) => {
       state.result = state.storage;
@@ -216,7 +215,7 @@ const inputSlice = createSlice({
         console.log('action.meta.arg', action.meta.arg);
 
         Object.keys(action.meta.arg).forEach(key => {
-          state.isCorrect[key as keyof InputsType<boolean>] = true;
+          state.isCorrect[key as keyof FormObject<Keys, boolean>] = true;
         });
         state.validationFails = {...state.validationFails, ...action.payload.fails};
       })

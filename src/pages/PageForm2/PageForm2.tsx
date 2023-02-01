@@ -4,13 +4,13 @@ import { ChangeEvent, FormEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
 import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsync } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { ErrorType, InputsType, KeysForm2, ValidData, ValueForm } from "../../type/FormObject";
+import { FormObject, Keys } from "../../type/FormObject";
 import './PageForm2.scss'
 
 export const PageForm2: FunctionComponent = () => {
   const valueStore = useAppSelector(selectInputs);
   const fails = useAppSelector(selectValidations);
-  const [showFails, setShowFails] = useState<InputsType<boolean>>({
+  const [showFails, setShowFails] = useState<FormObject<Keys, boolean>>({
     carBrand: true,
     zipCode: true,
     firstName: true,
@@ -19,7 +19,7 @@ export const PageForm2: FunctionComponent = () => {
     firstRegistration: true,
   });
   const dispatch = useAppDispatch();
-  const [value, setValue] = useState<ValueForm>({
+  const [value, setValue] = useState<FormObject<Keys, string>>({
     firstName: valueStore.firstName,
     lastName: valueStore.lastName,
     carModel: valueStore.carModel,
@@ -40,7 +40,7 @@ export const PageForm2: FunctionComponent = () => {
     [e.target.name]: e.target.value,
   });
 
-  if (showFails[e.target.name as keyof InputsType<boolean>]) {
+  if (showFails[e.target.name as keyof FormObject<Keys, boolean>]) {
     setShowFails({
       ...showFails,
       [e.target.name]: false,
@@ -53,17 +53,17 @@ export const PageForm2: FunctionComponent = () => {
 
     for(const key in value){
       dispatch(setInput({
-        key: key as KeysForm2,
-        value: value[key as keyof ValueForm]
+        key: key as Keys,
+        value: value[key as keyof FormObject<Keys, string>]
       }));
     }
 
     const response: PayloadAction<{
           success: boolean;
-          fails: ValidData;
+          fails: FormObject<Keys, string[]>;
           message: string;
       } | undefined, string, {
-          arg: ValueForm;
+          arg: FormObject<Keys, string>;
           requestId: string;
           requestStatus: "fulfilled";
       }, never> | {
@@ -129,14 +129,14 @@ export const PageForm2: FunctionComponent = () => {
                 id={key}
                 type="text"
                 name={key}
-                value={value[key as keyof ValueForm]}
+                value={value[key as keyof FormObject<Keys, string>]}
                 onChange={onChange}
                 placeholder={`input ${key}`}
               />
 
-              {showFails[key as keyof ValueForm] && 
+              {showFails[key as keyof FormObject<Keys, string>] && 
                 <ul key={key}>
-                  {fails[key as keyof ErrorType]!.map((e: string) => (
+                  {fails[key as keyof FormObject<Keys, string[]>]!.map((e: string) => (
                     <li key={e}>{e}</li>
                     ))}
                 </ul>

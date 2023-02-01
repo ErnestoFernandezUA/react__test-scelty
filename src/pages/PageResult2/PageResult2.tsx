@@ -2,13 +2,13 @@ import React, { FunctionComponent, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { clearState, selectResult } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { InputsType } from "../../type/FormObject";
+import { FormObject, Keys } from "../../type/FormObject";
 import './PageResult2.scss'
 
 
 
 export const PageResult2: FunctionComponent = () => {
-  const result = useAppSelector(selectResult) as InputsType<string>;
+  const result = useAppSelector(selectResult) as FormObject<Keys, string>;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
