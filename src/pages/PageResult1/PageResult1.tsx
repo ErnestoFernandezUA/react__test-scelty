@@ -1,19 +1,9 @@
-import React, { ChangeEvent, FunctionComponent, useEffect, useState } from "react";
-import { Link, useNavigate } from 'react-router-dom';
-import { clearState, selectInputs, selectResult, setInput } from "../../store/features/Inputs/inputSlice";
+import React, { FunctionComponent, useEffect } from "react";
+import { Link } from 'react-router-dom';
+import { clearState, selectResult } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { InputsType } from "../../type/Error";
 import './PageResult1.scss'
-
-interface InputsType<T> {
-  carBrand: T,
-  zipCode: T,
-  firstName: T,
-  lastName: T,
-  carModel: T,
-  firstRegistration: T,
-}
-
-localStorage.clear();
 
 export const PageResult1: FunctionComponent = () => {
   const result = useAppSelector(selectResult) as InputsType<string>;

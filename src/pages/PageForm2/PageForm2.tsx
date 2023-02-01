@@ -2,22 +2,10 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import classNames from "classnames";
 import { ChangeEvent, FormEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
-import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsync, validateAsyncForm2 } from "../../store/features/Inputs/inputSlice";
+import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsync } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { ErrorType, KeysForm2, ValidData2, ValueForm, ValueForm2 } from "../../type/Error";
 import './PageForm2.scss'
-
-// const initialErrors = {
-//   firstName: [],
-//   lastName: [],
-//   carModel: [],
-//   firstRegistration: [],
-// };
-
-// export type KeysForm2 = 'firstName' | 'lastName' | 'carModel' | 'firstRegistration';
-// type ValueForm2 = {[key in KeysForm2]: string};
-// type ValidData2 = {[key in KeysForm2]: string[]};
-// type Error2 = {[key in KeysForm2]: string[]}
 
 export const PageForm2: FunctionComponent = () => {
   const valueStore = useAppSelector(selectInputs);
@@ -29,7 +17,6 @@ export const PageForm2: FunctionComponent = () => {
     carModel: valueStore.carModel,
     firstRegistration: valueStore.firstRegistration,
   });
-  // const [error, setError] = useState<Error2>(fails);
   const [message, setMessage] = useState<boolean>(false);
   const [success, setSuccess] = useState(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);

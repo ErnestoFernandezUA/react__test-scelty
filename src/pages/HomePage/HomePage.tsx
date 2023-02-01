@@ -9,9 +9,9 @@ export const HomePage: FunctionComponent = () => {
 
       <div className="HomePage__content">
         <p>It's simple form with react-toolkit-thunk.</p>
-        <br />
+
         <p>It simulate receiving validation fails from server.</p>
-        <br />
+
         <p>If input data correct, user relocate to result page.</p>
       </div>
       
