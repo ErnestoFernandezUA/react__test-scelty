@@ -11,6 +11,21 @@
     display: flex;
   }
 
+  &__StepLoader {
+    width: 100%;
+    
+    &-inner {
+      width: 0;
+      height: 10px;
+      background-color: #00AAFF;
+      animation-name: load;
+      animation-duration: 6s;
+      animation-iteration-count: 1;
+      animation-timing-function: linear;
+      
+    }
+  }
+
   & h1 {
     text-align: center;
     margin: 0;
@@ -69,5 +84,15 @@
   &__correctData {
     text-align: left;
     color: grey;
+  }
+}
+
+@keyframes load {
+  from {
+    width: calc(0%);
+  }
+
+  to {
+    width: calc(100%);
   }
 }

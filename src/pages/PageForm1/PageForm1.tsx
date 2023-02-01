@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import classNames from "classnames";
-import React, { ChangeEvent, FunctionComponent, useState, useEffect } from "react";
+import React, { ChangeEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { selectInputs, selectIsLoading, selectValidations, setInput, validateAsync } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -17,12 +17,6 @@ export const PageForm1: FunctionComponent = () => {
     zipCode: valueStore.zipCode,
   });
   const [showFails, setShowFails] = useState<InputsType<boolean>>({
-    // carBrand: !!fails.carBrand?.length,
-    // zipCode: !!fails.zipCode?.length,
-    // firstName: !!fails.firstName?.length,
-    // lastName: !!fails.lastName?.length,
-    // carModel: !!fails.carBrand?.length,
-    // firstRegistration: !!fails.firstRegistration?.length,
     carBrand: true,
     zipCode: true,
     firstName: true,
@@ -37,29 +31,18 @@ export const PageForm1: FunctionComponent = () => {
   const navigate = useNavigate();
   const isLoading = useAppSelector(selectIsLoading);
 
-
-  // useEffect(() => {
-  //   console.log(fails);
-
-  //   for(const key in fails) {
-  //     setShowFails({
-  //       ...showFails,
-  //       [key]: fails[key as keyof InputsType<string[]>]!.length
-  //     })
-  //   }
-  // }, [])
-
   const onChange = (e: ChangeEvent<HTMLInputElement>) => { 
     setValue({
       ...value,
       [e.target.name]: e.target.value,
     });
 
-    if (showFails[e.target.name as keyof InputsType<boolean>]) {}
-    setShowFails({
-      ...showFails,
-      [e.target.name]: false,
-    });
+    if (showFails[e.target.name as keyof InputsType<boolean>]) {
+      setShowFails({
+        ...showFails,
+        [e.target.name]: false,
+      });
+    }
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -105,9 +88,6 @@ export const PageForm1: FunctionComponent = () => {
       }));
     }
   };
-
-  console.log('fails = ', fails);
-  // console.log('showFails = ', showFails);
 
   return (
     <div className="PageForm1">
