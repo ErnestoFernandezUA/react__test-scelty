@@ -5,9 +5,8 @@ import {
 } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../..';
-import {
-KeysForm1, KeysForm2, ValidData, ErrorType, Value, KeysForm, InputsType, 
-} from '../../../type/Error';
+import { ValidData, ErrorType, FormObject, Keys, InputsType, 
+} from '../../../type/FormObject';
 
 const DELAY = 1000;
 
@@ -113,7 +112,7 @@ const initialState: InputState = {
 export const validateAsync = createAsyncThunk(
   'inputs/validateFormAll',
   async (
-      value:Value<KeysForm, string>,
+      value:FormObject<Keys, string>,
     { rejectWithValue, getState },
     ) => {
     const state =  getState() as RootState;
@@ -123,37 +122,37 @@ export const validateAsync = createAsyncThunk(
     try {
       const response: {
         success: boolean,
-        fails: Value<KeysForm, string[]>,
+        fails: FormObject<Keys, string[]>,
         message: string,
       } = await new Promise(response => setTimeout(() => {
         let isValidInput = true;
 
-        const fails: Value<KeysForm, string[]> = {
+        const fails: FormObject<Keys, string[]> = {
           ...state.inputs.validationFails,
         };
 
         for(const key in value){
-          fails[key as keyof Value<KeysForm, string>] = [];
+          fails[key as keyof FormObject<Keys, string>] = [];
 
-          if (!value[key as keyof Value<KeysForm, string>]
+          if (!value[key as keyof FormObject<Keys, string>]
             && wrongMessageOBJ(value, key)[0].applyRules
             ){
-            console.log(value[key as keyof Value<KeysForm, string>]);
+            console.log(value[key as keyof FormObject<Keys, string>]);
 
             fails[key as keyof ErrorType] = [
-              ...fails[key as keyof Value<KeysForm, string[]>]!,
+              ...fails[key as keyof FormObject<Keys, string[]>]!,
                wrongMessageOBJ(value, key)[0].wrongMessage,
             ];
 
             isValidInput = false;
           }
 
-          if (wrongMessageOBJ(value, key)[1].applyRules && !validData[key as keyof Value<KeysForm, string[]>]!
+          if (wrongMessageOBJ(value, key)[1].applyRules && !validData[key as keyof FormObject<Keys, string[]>]!
             .some((el: string) => 
-            el.toLowerCase() === value[key as keyof Value<KeysForm, string>]!.toLowerCase())
+            el.toLowerCase() === value[key as keyof FormObject<Keys, string>]!.toLowerCase())
             ) {
-              fails[key as keyof Value<KeysForm, string[]>] = [
-                ...fails[key as keyof Value<KeysForm, string[]>]!,
+              fails[key as keyof FormObject<Keys, string[]>] = [
+                ...fails[key as keyof FormObject<Keys, string[]>]!,
                 wrongMessageOBJ(value, key)[1].wrongMessage,
               ];
 
@@ -184,7 +183,7 @@ const inputSlice = createSlice({
   initialState,
   reducers: {
     setInput: (state: InputState, action: PayloadAction<{
-      key: KeysForm1 | KeysForm2,
+      key: Keys,
       value: any,
     }>) => {
       state.storage[action.payload.key as keyof InputsType<string>] = action.payload.value;

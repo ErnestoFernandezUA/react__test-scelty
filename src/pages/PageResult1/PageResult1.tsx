@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { clearState, selectResult } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { InputsType } from "../../type/Error";
+import { InputsType } from "../../type/FormObject";
 import './PageResult1.scss'
 
 export const PageResult1: FunctionComponent = () => {

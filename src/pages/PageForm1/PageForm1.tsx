@@ -4,7 +4,7 @@ import React, { ChangeEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { selectInputs, selectIsLoading, selectValidations, setInput, validateAsync } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { ErrorType, InputsType, KeysForm1, ValidData1, ValueForm, ValueForm1 } from "../../type/Error";
+import { ErrorType, InputsType, KeysForm1, ValidData, ValueForm } from "../../type/FormObject";
 import './PageForm1.scss'
 
 localStorage.clear()
@@ -51,16 +51,16 @@ export const PageForm1: FunctionComponent = () => {
     for(const key in value){
       dispatch(setInput({
         key: key as KeysForm1,
-        value: value[key as keyof ValueForm1]
+        value: value[key as keyof ValueForm]
       }));
     }
 
     const response: PayloadAction<{
       success: boolean;
-      fails: ValidData1;
+      fails: ValidData;
       message: string;
   } | undefined, string, {
-      arg: ValueForm1;
+      arg: ValueForm;
       requestId: string;
       requestStatus: "fulfilled";
   }, never> | {
@@ -122,7 +122,7 @@ export const PageForm1: FunctionComponent = () => {
                 id={key}
                 type="text"
                 name={key}
-                value={value[key as keyof ValueForm1]}
+                value={value[key as keyof ValueForm]}
                 onChange={onChange}
                 placeholder={`input ${key}`}
               />

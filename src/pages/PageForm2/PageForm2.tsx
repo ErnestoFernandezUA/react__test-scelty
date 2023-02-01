@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent, FunctionComponent, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
 import { selectInputs, selectIsCorrectDataForm1, selectIsLoading, selectValidations, setInput, setResult, validateAsync } from "../../store/features/Inputs/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { ErrorType, InputsType, KeysForm2, ValidData2, ValueForm } from "../../type/Error";
+import { ErrorType, InputsType, KeysForm2, ValidData, ValueForm } from "../../type/FormObject";
 import './PageForm2.scss'
 
 export const PageForm2: FunctionComponent = () => {
@@ -60,7 +60,7 @@ export const PageForm2: FunctionComponent = () => {
 
     const response: PayloadAction<{
           success: boolean;
-          fails: ValidData2;
+          fails: ValidData;
           message: string;
       } | undefined, string, {
           arg: ValueForm;
